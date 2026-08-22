@@ -31,6 +31,11 @@ npm run preview  # serve dist/ locally
 
 Node 24, npm 11. No other tooling required.
 
+**Commit identity is set repo-locally** to `14030456+revdarkness@users.noreply.github.com`.
+GitHub rejects pushes that would publish the account's private email, and this repo
+is public. If a commit here ever fails to push with `GH007`, the identity was
+overridden somewhere; do not disable the protection, fix the address.
+
 ---
 
 ## Writing a post
@@ -90,7 +95,7 @@ on Pages and reserves Workers for dashboards and APIs.
 
 **One-time setup:**
 
-1. Push this repo to GitHub as `revdarkness/davidcberry`.
+1. ~~Push this repo to GitHub as `revdarkness/davidcberry`.~~ **Done 2026-08-22:** https://github.com/revdarkness/davidcberry (public, `main`).
 2. Cloudflare dashboard, **Workers & Pages > Create > Pages > Connect to Git**.
 3. Pick the repo. Build settings:
    - Framework preset: **Astro**
