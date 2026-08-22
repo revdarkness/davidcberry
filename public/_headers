@@ -1,0 +1,22 @@
+# Cloudflare Pages header rules.
+# Ported from the old vercel.json, plus a CSP the static build can actually
+# satisfy. Cache-Control on /assets/* is unchanged at one week.
+#
+# Note on clean URLs and trailing slashes: vercel.json handled those with
+# cleanUrls/trailingSlash. Astro now emits /slug/index.html directly
+# (build.format: 'directory'), so Pages serves the right file with no rule.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'; upgrade-insecure-requests
+
+/assets/*
+  Cache-Control: public, max-age=604800, must-revalidate
+
+# Astro fingerprints these filenames, so they are safe to cache hard.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

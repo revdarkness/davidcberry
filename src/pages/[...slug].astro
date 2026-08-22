@@ -1,0 +1,28 @@
+---
+import { getCollection, render } from 'astro:content';
+import Article from '../layouts/Article.astro';
+
+// Posts sit at the site root (/student-data-stays-local/) rather than under
+// /writing/. That keeps the URLs already baked into the two hand-written
+// pieces, their canonical tags and the old sitemap, so nothing published
+// before this rebuild has to move.
+// Drafts render in `npm run dev` so you can read them at their real URL while
+// writing, and are not emitted by `npm run build` at all. Filtering them only
+// out of the list pages would still have leaked them into the sitemap.
+export async function getStaticPaths() {
+  const posts = await getCollection('writing', ({ data }) =>
+    import.meta.env.DEV ? true : data.draft !== true,
+  );
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<Article post={post}>
+  <Content />
+</Article>

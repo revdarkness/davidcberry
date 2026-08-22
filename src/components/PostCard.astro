@@ -1,0 +1,29 @@
+---
+import { TOPICS } from '../consts';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'writing'>;
+}
+const { post } = Astro.props;
+const d = post.data;
+const blurb = d.description ?? d.standfirst ?? '';
+const stamp = d.pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+---
+
+<a class="step" href={`/${post.id}/`}>
+  <span class="n">
+    {TOPICS[d.topic].label}
+    {d.kind === 'note' ? ' · Note' : ''}
+  </span>
+  <h4>{d.title}</h4>
+  {blurb && <p>{blurb}</p>}
+  <p class="card-meta">
+    <time datetime={d.pubDate.toISOString()}>{stamp}</time>
+    {d.readingTime && <span> &middot; {d.readingTime}</span>}
+  </p>
+</a>

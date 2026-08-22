@@ -1,0 +1,26 @@
+---
+import { NAV } from '../consts';
+const path = Astro.url.pathname;
+---
+
+<header class="site">
+  <nav class="wrap" aria-label="Primary">
+    <a class="logo" href="/">
+      <svg width="26" height="26" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#0a6c80" stroke-width="6"></circle>
+        <circle cx="50" cy="50" r="14" fill="#36e0ff"></circle>
+      </svg>
+      David Berry
+    </a>
+    <div class="navlinks">
+      {
+        NAV.map((item) => (
+          <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+      <a href="/rss.xml" class="btn btn-ghost">RSS</a>
+    </div>
+  </nav>
+</header>

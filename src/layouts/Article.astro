@@ -1,0 +1,82 @@
+---
+import Base from './Base.astro';
+import { TOPICS, SITE } from '../consts';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'writing'>;
+}
+const { post } = Astro.props;
+const d = post.data;
+const canonical = new URL(`/${post.id}/`, SITE.url).href;
+const stamp = d.pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<Base
+  title={d.title}
+  description={d.description ?? d.standfirst ?? SITE.description}
+  ogType="article"
+  canonical={canonical}
+>
+  <div class="article-head">
+    <div class="wrap">
+      <div class="meta">
+        <a class="tag" href={`/topics/${d.topic}/`}>{TOPICS[d.topic].label}</a>
+        {d.kind === 'note' && <span>Reading note</span>}
+        <span><time datetime={d.pubDate.toISOString()}>{stamp}</time></span>
+        {d.readingTime && <span>{d.readingTime}</span>}
+      </div>
+      <h1>{d.title}</h1>
+      {d.standfirst && <p class="standfirst">{d.standfirst}</p>}
+      {
+        d.source && (
+          <p class="source-note">
+            Responding to <a href={d.source.url} rel="noopener">{d.source.title}</a>
+            {d.source.author && <span> by {d.source.author}</span>}
+          </p>
+        )
+      }
+    </div>
+  </div>
+
+  <article class="prose">
+    <slot />
+  </article>
+
+  <div class="article-foot">
+    {
+      d.updatedDate && (
+        <p class="copy">
+          Updated{' '}
+          <time datetime={d.updatedDate.toISOString()}>
+            {d.updatedDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </time>
+        </p>
+      )
+    }
+    <div class="byline">
+      <svg width="34" height="34" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#0a6c80" stroke-width="7"></circle>
+        <circle cx="50" cy="50" r="14" fill="#36e0ff"></circle>
+      </svg>
+      <div>
+        <span class="who">David Berry</span>
+        <p>
+          I teach high school engineering design and run the infrastructure behind it: a
+          production site, a private GPU inference node, and the monitoring that watches both.
+          I write up the incidents and the controls, including the ones that were missing.
+          Classroom and curriculum work lives at
+          <a href="https://www.stemageddon.com/">STEMageddon</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</Base>

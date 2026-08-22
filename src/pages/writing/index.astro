@@ -1,0 +1,48 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPublished } from '../../lib/posts';
+import { TOPICS } from '../../consts';
+
+const posts = await getPublished();
+const topicKeys = Object.keys(TOPICS) as (keyof typeof TOPICS)[];
+---
+
+<Base
+  title="Writing"
+  description="Field notes on security incidents, AI governance, and running production infrastructure with no team and no budget."
+>
+  <section class="block">
+    <div class="wrap">
+      <p class="sec-label">Writing</p>
+      <h1 class="sec-h">Incidents, controls, and what was missing.</h1>
+      <p class="sec-sub">
+        Long pieces follow one shape: the threat, the decision, what got built, how it was
+        verified, and the risk still sitting there. Shorter notes are me arguing with something
+        I read. Both are here.
+      </p>
+
+      <nav class="topic-row" aria-label="Topics">
+        {
+          topicKeys.map((key) => (
+            <a href={`/topics/${key}/`} class="topic-chip">
+              {TOPICS[key].label}
+            </a>
+          ))
+        }
+      </nav>
+
+      {
+        posts.length === 0 ? (
+          <p class="sec-sub">Nothing published yet.</p>
+        ) : (
+          <div class="steps">
+            {posts.map((post) => (
+              <PostCard post={post} />
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </section>
+</Base>

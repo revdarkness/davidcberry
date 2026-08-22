@@ -1,0 +1,23 @@
+---
+import { SITE } from '../consts';
+const year = new Date().getFullYear();
+---
+
+<footer class="site">
+  <div class="wrap">
+    <a class="logo" href="/">
+      <svg width="20" height="20" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#0a6c80" stroke-width="7"></circle>
+        <circle cx="50" cy="50" r="14" fill="#36e0ff"></circle>
+      </svg>
+      David Berry
+    </a>
+    <div class="fl">
+      <a href="/writing/">Writing</a>
+      <a href="/about/">About</a>
+      <a href="/rss.xml">RSS</a>
+      <a href="https://www.stemageddon.com/" rel="me">STEMageddon</a>
+    </div>
+    <span class="copy">&copy; {year} {SITE.author}</span>
+  </div>
+</footer>

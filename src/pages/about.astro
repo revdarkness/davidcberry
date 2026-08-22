@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../consts';
+---
+
+<Base
+  title="About"
+  description="David Berry: engineering educator, infrastructure operator, and AI governance practitioner."
+>
+  <div class="article-head">
+    <div class="wrap">
+      <div class="meta"><span class="tag">About</span></div>
+      <h1>About</h1>
+      <p class="standfirst">
+        I teach high school engineering design, and I run the infrastructure that supports it.
+        This site is where the second half gets written down.
+      </p>
+    </div>
+  </div>
+
+  <article class="prose">
+    <p>
+      Most of what I publish here starts as something that broke. A site I own was compromised
+      and stayed compromised for six days while every health check reported 200. A monitor I
+      trusted turned out never to have been tested against a failure. An IAM policy I revoked
+      left the access key behind it fully live. Each of those became a control, and each control
+      became a piece of writing.
+    </p>
+
+    <p>
+      The through-line is verification. Anyone can describe a control. A control nobody tested is
+      a belief, and a control with no stated residual risk is a sales pitch. So the pieces here
+      follow one shape: what the exposure actually was, why the obvious fix did not close it,
+      what got built, how it was proven, and what is still sitting there unaddressed.
+    </p>
+
+    <h2>What I actually operate</h2>
+    <ul>
+      <li>A production WordPress site behind a CDN-only origin firewall, with public SSH closed and access over a mesh VPN.</li>
+      <li>A two-GPU inference node running a local model, so student work never reaches a vendor API during grading or feedback.</li>
+      <li>Uptime and patch-state monitoring for both, including a push canary that fails when the update machinery itself dies.</li>
+    </ul>
+
+    <h2>Where I am headed</h2>
+    <p>
+      Toward security and AI governance work. The credential track is NIST AI RMF and the IAPP
+      AIGP; the practical track is the systems above, documented properly. Both are in progress
+      and I write about them as they go rather than after they are tidy.
+    </p>
+
+    <h2>Elsewhere</h2>
+    <p>
+      Classroom, curriculum, and student-facing work lives at
+      <a href="https://www.stemageddon.com/">STEMageddon</a>. I mentor a NASA HUNCH team and
+      host regional design reviews.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Email is the reliable path: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+    </p>
+  </article>
+</Base>

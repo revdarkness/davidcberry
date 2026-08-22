@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+import { getPublished } from '../lib/posts';
+import { SITE } from '../consts';
+
+const posts = await getPublished();
+const recent = posts.slice(0, 6);
+---
+
+<Base title={SITE.title} description={SITE.description}>
+  <section class="hero">
+    <div class="wrap">
+      <span class="kicker">Security &middot; AI Governance &middot; Engineering Education</span>
+      <h1>I run the <span class="accent">infrastructure</span> I write about.</h1>
+      <p class="lede">
+        A production site, a private GPU inference node, and the monitoring that watches both.
+        No team, no budget, no on-call rotation, and a duty of care over minors' data. I write
+        up the incidents and the controls, including the ones that were missing.
+      </p>
+      <div class="cta-row">
+        <a href="/writing/" class="btn btn-primary">Read the field notes</a>
+        <a href="/about/" class="btn btn-ghost">About</a>
+      </div>
+      <p class="reassure">Written from primary sources. Every claim traces to something recorded.</p>
+    </div>
+  </section>
+
+  <div class="cred">
+    <div class="wrap">
+      <span>Incident response, end to end</span>
+      <span class="dot">&bull;</span>
+      <span>Private LLM inference</span>
+      <span class="dot">&bull;</span>
+      <span>NIST AI RMF in practice</span>
+      <span class="dot">&bull;</span>
+      <span>NASA HUNCH mentor</span>
+    </div>
+  </div>
+
+  <section class="block" id="notes">
+    <div class="wrap">
+      <p class="sec-label">Field Notes</p>
+      <h2 class="sec-h">Recent writing</h2>
+      <p class="sec-sub">
+        The long pieces follow one shape: threat, decision, implementation, verification,
+        residual risk. The short ones are me arguing with something I read.
+      </p>
+
+      {
+        recent.length === 0 ? (
+          <p class="sec-sub">Nothing published yet.</p>
+        ) : (
+          <div class="steps">
+            {recent.map((post) => (
+              <PostCard post={post} />
+            ))}
+          </div>
+        )
+      }
+
+      {posts.length > recent.length && <p style="margin-top:34px"><a href="/writing/">All writing</a></p>}
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="callout">
+        <p class="sec-label">Classroom work</p>
+        <h3>The teaching side lives somewhere else.</h3>
+        <p>
+          Curriculum, lesson materials, and everything student-facing is at STEMageddon. This
+          site is the practitioner side: what I build, what broke, and what I learned closing it.
+        </p>
+        <a href="https://www.stemageddon.com/" class="btn btn-ghost">Visit STEMageddon</a>
+      </div>
+    </div>
+  </section>
+</Base>

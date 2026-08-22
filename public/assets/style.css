@@ -1,0 +1,285 @@
+/* davidcberry.com — quieter dialect of the STEMAGEDDON brand.
+   Shared DNA: same type + palette. Light warm-paper base, armor theming stripped.
+   Design approved 2026-06-23 (davidcberry-mockup.html). */
+
+:root{
+  --cyan:#36e0ff;
+  --teal:#0a6c80;
+  --teal-2:#0e8aa3;
+  --orange:#ff5a1f;
+  --ink:#0a0e14;
+  --ink-2:#14222f;
+  --body:#39495a;
+  --muted:#6f8398;
+  --line:#e2e8ef;
+  --paper:#faf9f5;
+  --surface:#ffffff;
+  --shadow:0 1px 3px rgba(10,14,20,.06),0 8px 30px rgba(10,14,20,.06);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:'Hanken Grotesk',system-ui,-apple-system,sans-serif;
+  color:var(--body);background:var(--paper);line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Space Grotesk',system-ui,sans-serif;color:var(--ink);line-height:1.1;letter-spacing:-.02em}
+a{color:var(--teal);text-decoration:none}
+a:hover{text-decoration:underline}
+img{max-width:100%;height:auto}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+.kicker{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--teal)}
+
+.btn{
+  display:inline-block;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.98rem;
+  padding:14px 26px;border-radius:10px;border:1.5px solid transparent;cursor:pointer;transition:.15s;
+}
+.btn:hover{text-decoration:none}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:var(--teal);box-shadow:0 6px 20px rgba(54,224,255,.25)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+
+/* ---------- skip link (a11y) ---------- */
+.skip{position:absolute;left:-9999px;top:0;background:var(--ink);color:#fff;padding:12px 18px;z-index:100;border-radius:0 0 8px 0}
+.skip:focus{left:0}
+
+/* ---------- nav ---------- */
+header.site{position:sticky;top:0;z-index:50;background:rgba(250,249,245,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.site nav{display:flex;align-items:center;justify-content:space-between;height:68px;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--ink);font-size:1.12rem;letter-spacing:-.01em;white-space:nowrap}
+.logo:hover{text-decoration:none}
+.logo svg{flex:none}
+.navlinks{display:flex;gap:30px;align-items:center}
+.navlinks a{color:var(--ink-2);font-weight:500;font-size:.95rem}
+.navlinks a:hover{color:var(--teal);text-decoration:none}
+.navlinks .btn{padding:9px 18px;font-size:.9rem}
+/* `.navlinks a` (0,1,1) outranks `.btn-primary` (0,1,0) and would repaint the
+   CTA label dark-on-dark. Restate at higher specificity. Same bug is live in
+   the original mockup. */
+.navlinks a.btn-primary{color:#fff}
+.navlinks a.btn-primary:hover{color:#fff}
+.navlinks a.btn-ghost{color:var(--ink)}
+.navlinks a.btn-ghost:hover{color:var(--teal)}
+@media(max-width:820px){.navlinks a:not(.btn){display:none}}
+
+/* ---------- hero ---------- */
+.hero{padding:84px 0 70px}
+.hero .kicker{margin-bottom:20px;display:block}
+.hero h1{font-size:clamp(2.3rem,5.4vw,4rem);font-weight:700;max-width:15ch}
+.hero h1 .accent{color:var(--teal)}
+.hero p.lede{font-size:1.22rem;color:var(--body);max-width:52ch;margin:24px 0 32px}
+.hero .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+.hero .reassure{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.78rem;color:var(--muted);margin-top:18px}
+
+/* ---------- credibility strip ---------- */
+.cred{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
+.cred .wrap{display:flex;align-items:center;justify-content:space-between;gap:clamp(12px,2.2vw,26px);flex-wrap:wrap;padding-top:22px;padding-bottom:22px}
+.cred span{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.74rem;letter-spacing:.06em;color:var(--ink-2);text-transform:uppercase}
+/* nowrap only where there is room for it; below that the claims must be free to
+   break or a single long one forces the whole page to scroll sideways */
+@media(min-width:901px){.cred span{white-space:nowrap}}
+/* the separator dots are decoration; drop them once the row has to wrap */
+@media(max-width:900px){.cred .dot{display:none}.cred .wrap{justify-content:flex-start;gap:10px 22px}}
+.cred .dot{color:var(--cyan)}
+
+/* ---------- sections ---------- */
+section.block{padding:78px 0}
+.sec-label{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.sec-h{font-size:clamp(1.9rem,3.6vw,2.6rem);font-weight:700;max-width:20ch}
+.sec-sub{font-size:1.1rem;color:var(--body);max-width:58ch;margin-top:16px}
+
+/* ---------- lead magnet ---------- */
+.magnet{
+  display:grid;grid-template-columns:1fr .8fr;gap:44px;align-items:center;
+  background:var(--surface);border:1px solid var(--line);border-radius:18px;
+  box-shadow:var(--shadow);padding:44px;
+}
+@media(max-width:860px){.magnet{grid-template-columns:1fr;gap:28px;padding:32px}}
+.magnet h2{font-size:clamp(1.7rem,3vw,2.2rem)}
+.magnet p{margin-top:14px}
+.magnet ul{list-style:none;margin:20px 0 26px}
+.magnet ul li{display:flex;gap:11px;padding:7px 0;color:var(--ink-2);font-weight:500;align-items:flex-start}
+.magnet ul li svg{flex:none;margin-top:5px}
+.magnet .sheet{
+  aspect-ratio:8.5/11;border-radius:10px;overflow:hidden;
+  border:1px solid var(--line);box-shadow:0 14px 44px rgba(10,14,20,.16);
+  background:var(--paper);position:relative;transform:rotate(-1.4deg);
+}
+.magnet .sheet .band{background:var(--ink-2);color:#fff;padding:14% 9% 10%}
+.magnet .sheet .band em{font-family:'JetBrains Mono',ui-monospace,monospace;font-style:normal;font-size:.52rem;letter-spacing:.16em;color:var(--cyan);display:block;margin-bottom:6px}
+.magnet .sheet .band b{font-family:'Space Grotesk',sans-serif;font-size:1.35rem;display:block;line-height:1.05}
+.magnet .sheet .lines{padding:9% 9%}
+.magnet .sheet .lines i{display:block;height:5px;border-radius:3px;background:#e6e2d8;margin-bottom:8px}
+.magnet .sheet .lines i:nth-child(3n){width:72%}
+.magnet .sheet .lines i:nth-child(4n){width:88%}
+.magnet .sheet .row{display:flex;gap:6px;margin-top:14px}
+.magnet .sheet .row u{flex:1;height:38px;border-radius:4px;text-decoration:none;background:#f0ede4;border-top:3px solid var(--teal-2)}
+.magnet .sheet .row u:first-child{border-top-color:var(--orange)}
+.magnet .sheet .row u:last-child{border-top-color:#5ad1a0}
+
+/* ---------- offer card ---------- */
+.offer{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;display:grid;grid-template-columns:1.15fr .85fr}
+@media(max-width:860px){.offer{grid-template-columns:1fr}}
+.offer .left{padding:42px}
+.offer .left h3{font-size:1.7rem;margin-bottom:6px}
+.offer .left .tag{color:var(--teal);font-weight:600;font-family:'Space Grotesk',sans-serif}
+.feat{list-style:none;margin:26px 0 0}
+.feat li{display:flex;gap:12px;padding:9px 0;color:var(--ink-2);font-weight:500}
+.feat li svg{flex:none;margin-top:4px}
+.offer .right{background:linear-gradient(160deg,#0a0e14,#14222f);color:#cfe0ef;padding:42px;display:flex;flex-direction:column;justify-content:center}
+.offer .right .price{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:3.1rem;color:#fff;line-height:1}
+.offer .right .price small{font-size:1rem;color:#9fb1c4;font-weight:500}
+.offer .right .alt{color:#9fb1c4;margin:8px 0 22px;font-size:.95rem}
+.offer .right .founding{display:inline-block;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#0a0e14;background:var(--cyan);padding:5px 11px;border-radius:6px;margin-bottom:18px;font-weight:600;align-self:flex-start}
+.offer .right .btn-primary{background:var(--cyan);color:#0a0e14;text-align:center}
+.offer .right .btn-primary:hover{background:#8af3ff}
+.offer .right .mini{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.72rem;color:#6f8398;margin-top:14px;text-align:center}
+
+/* ---------- steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
+@media(max-width:820px){.steps{grid-template-columns:1fr}}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px;box-shadow:var(--shadow)}
+.step .n{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.8rem;color:var(--teal);font-weight:600}
+.step h4{font-size:1.18rem;margin:10px 0 8px}
+.step p{font-size:.96rem;color:var(--body)}
+
+/* post cards */
+a.step{display:block;color:inherit}
+a.step:hover{text-decoration:none;border-color:var(--teal);box-shadow:0 6px 26px rgba(54,224,255,.16);transform:translateY(-2px)}
+a.step{transition:.16s}
+a.step .more{font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--teal);font-size:.94rem;margin-top:14px;display:inline-block}
+
+/* ---------- speaker ---------- */
+.speaker{background:var(--ink);color:#cfe0ef;border-radius:20px;padding:56px;display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center}
+@media(max-width:860px){.speaker{grid-template-columns:1fr;padding:38px}}
+.speaker h2{color:#fff;font-size:clamp(1.8rem,3.4vw,2.4rem)}
+.speaker .sec-label{color:var(--cyan)}
+.speaker p{color:#9fb1c4;margin-top:16px;font-size:1.06rem}
+.speaker .list{margin-top:22px;display:flex;flex-direction:column;gap:10px}
+.speaker .list div{color:#d8fbff;font-weight:500;display:flex;gap:10px;align-items:center}
+.speaker .btn{background:var(--cyan);color:#0a0e14}
+.speaker .btn:hover{background:#8af3ff}
+
+/* ---------- newsletter ---------- */
+.news{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:54px 32px;box-shadow:var(--shadow)}
+.news h2{font-size:clamp(1.6rem,3vw,2rem)}
+.news p{margin:14px auto 26px;max-width:48ch}
+.news form{display:flex;gap:10px;max-width:460px;margin:0 auto;flex-wrap:wrap}
+.news input{flex:1;min-width:220px;padding:14px 16px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit;font-size:1rem;color:var(--ink)}
+.news input:focus{outline:none;border-color:var(--teal)}
+.news .status{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.78rem;color:var(--muted);margin-top:16px;min-height:1.2em}
+.news .status.ok{color:var(--teal)}
+
+/* ---------- footer ---------- */
+footer.site{border-top:1px solid var(--line);background:var(--surface);margin-top:20px}
+footer.site .wrap{display:flex;justify-content:space-between;align-items:center;padding:34px 28px;flex-wrap:wrap;gap:16px}
+footer.site .logo{font-size:1rem}
+footer.site .fl{display:flex;gap:24px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;flex-wrap:wrap}
+footer.site .fl a{color:var(--muted)}
+footer.site .fl a:hover{color:var(--teal)}
+.copy{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.74rem;color:var(--muted)}
+
+/* ================= ARTICLE ================= */
+.article-head{padding:64px 0 34px;border-bottom:1px solid var(--line)}
+.article-head .wrap{max-width:760px}
+.article-head .meta{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;display:flex;gap:14px;flex-wrap:wrap}
+.article-head .meta .tag{color:var(--teal)}
+.article-head h1{font-size:clamp(2rem,4.6vw,3.1rem);font-weight:700}
+.article-head .standfirst{font-size:1.2rem;margin-top:20px;color:var(--body)}
+
+.prose{max-width:760px;margin:0 auto;padding:44px 28px 20px}
+.prose > * + *{margin-top:1.15em}
+.prose p{font-size:1.08rem}
+.prose h2{font-size:clamp(1.45rem,2.6vw,1.85rem);margin-top:2.1em;margin-bottom:.1em}
+.prose h3{font-size:1.2rem;margin-top:1.7em;margin-bottom:.1em}
+.prose strong{color:var(--ink-2);font-weight:700}
+.prose ul,.prose ol{padding-left:1.35em}
+.prose li{margin-top:.45em}
+.prose li::marker{color:var(--teal)}
+.prose blockquote{
+  border-left:4px solid var(--cyan);background:var(--surface);
+  padding:18px 24px;border-radius:0 10px 10px 0;color:var(--ink-2);
+  font-size:1.08rem;box-shadow:var(--shadow);
+}
+.prose hr{border:none;border-top:1px solid var(--line);margin:2.4em 0}
+.prose .lede-rule{
+  background:var(--ink-2);color:#fff;border-left:5px solid var(--orange);
+  padding:22px 26px;border-radius:0 10px 10px 0;
+}
+.prose .lede-rule b{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;display:block;color:#fff;margin-bottom:6px}
+.prose .lede-rule span{color:#c8d4de;font-size:1rem}
+
+.prose table{width:100%;border-collapse:collapse;font-size:.98rem;display:block;overflow-x:auto}
+.prose table th,.prose table td{border:1px solid var(--line);padding:11px 14px;text-align:left;vertical-align:top}
+.prose table th{background:var(--surface);font-family:'Space Grotesk',sans-serif;color:var(--ink);font-size:.9rem;letter-spacing:.01em}
+
+.callout{
+  background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--teal);
+  border-radius:0 12px 12px 0;padding:24px 26px;box-shadow:var(--shadow);
+}
+.callout .sec-label{margin-bottom:8px}
+.callout h3{margin-bottom:8px}
+.callout .btn{margin-top:16px}
+
+.article-foot{max-width:760px;margin:0 auto;padding:10px 28px 80px}
+.byline{display:flex;gap:18px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:26px;box-shadow:var(--shadow)}
+.byline .who{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--ink);display:block;margin-bottom:6px}
+.byline p{font-size:.98rem}
+
+/* ================= BLOG ADDITIONS (Astro rebuild, 2026-08-22) ================= */
+
+/* topic filter row on /writing/ */
+.topic-row{display:flex;gap:10px;flex-wrap:wrap;margin:30px 0 8px}
+.topic-chip{
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.72rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-2);background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;padding:8px 15px;transition:.15s;
+}
+.topic-chip:hover{border-color:var(--teal);color:var(--teal);text-decoration:none}
+
+/* post cards inherit .step; this is the date/reading-time line under the blurb */
+.card-meta{
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.72rem;
+  color:var(--muted);margin-top:14px;letter-spacing:.04em;
+}
+
+/* the card grid is 3-up on the landing page; on /writing/ it keeps flowing */
+.steps{margin-top:34px}
+
+/* article head: "responding to <source>" line on reading notes */
+.source-note{
+  font-size:.98rem;color:var(--muted);margin-top:18px;
+  border-left:3px solid var(--line);padding-left:14px;
+}
+
+/* the meta row's topic link is an <a>, so give it the tag colour on hover too */
+.article-head .meta a.tag{color:var(--teal)}
+.article-head .meta a.tag:hover{color:var(--teal-2)}
+
+/* markdown emits bare <pre><code>; Shiki adds its own background */
+.prose pre{
+  border:1px solid var(--line);border-radius:10px;padding:18px 20px;
+  overflow-x:auto;font-size:.9rem;line-height:1.5;
+}
+.prose code{
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.9em;
+}
+.prose :not(pre) > code{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:5px;padding:1px 6px;color:var(--ink-2);
+}
+.prose pre code{background:none;border:none;padding:0}
+
+/* markdown tables come through without the display:block the hand-written
+   pages used, so keep the horizontal scroll but let short tables stay inline */
+.prose table{display:table}
+@media(max-width:700px){.prose table{display:block}}
+
+/* focus visibility: the hand-written pages never needed this because they had
+   no interactive controls beyond links. WCAG 2.2 SC 2.4.11. */
+a:focus-visible,.btn:focus-visible,.topic-chip:focus-visible{
+  outline:3px solid var(--teal);outline-offset:2px;border-radius:4px;
+}
