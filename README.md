@@ -87,16 +87,23 @@ having to re-read 400 lines to check. New posts should be written as real markdo
 
 ## Deploy: Cloudflare Pages
 
+**LIVE at https://davidcberry.com since 2026-08-23.** Push to `main` rebuilds it.
+
 Chosen over Vercel because Vercel's Hobby plan forbids commercial use and this
 domain's long-term job is undecided on that point. Cloudflare Pages allows
 commercial use on the free tier, has no bandwidth cap, and adds no server to
 patch. Pages rather than Workers: current guidance puts blogs and marketing sites
 on Pages and reserves Workers for dashboards and APIs.
 
-**One-time setup:**
+**One-time setup, as actually performed 2026-08-23:**
 
 1. ~~Push this repo to GitHub as `revdarkness/davidcberry`.~~ **Done 2026-08-22:** https://github.com/revdarkness/davidcberry (public, `main`).
-2. Cloudflare dashboard, **Workers & Pages > Create > Pages > Connect to Git**.
+2. Cloudflare dashboard, **Compute (Workers & Pages) > Create**. This now lands on
+   a **Create a Worker** screen; Pages is no longer the default path. Click the
+   **"Looking to deploy Pages? Get started"** link under the method cards, then
+   **Import an existing Git repository**. Taking "Continue with GitHub" from the
+   Worker screen builds a Worker with static assets instead, which is a different
+   product with a different custom-domain and config path.
 3. Pick the repo. Build settings:
    - Framework preset: **Astro**
    - Build command: `npm run build`
@@ -104,16 +111,67 @@ on Pages and reserves Workers for dashboards and APIs.
    - Node version: set `NODE_VERSION` to `24` if the default is older.
 4. Deploy. You get a `*.pages.dev` URL immediately.
 5. **Custom domains** > add `davidcberry.com` and `www.davidcberry.com`. DNS is
-   already on Cloudflare, so the records are created for you.
+   already on Cloudflare, so the records are created for you. **Add the apex
+   explicitly and confirm it reaches *Active*.** On the first pass only `www`
+   activated; the apex was left with no A/AAAA record at all, so the hostname
+   resolved to nothing while the site looked live on `www`. See the trap below.
 6. Pick one canonical host and redirect the other. **Use the apex**, since
    `astro.config.mjs` sets `site: 'https://davidcberry.com'` and the sitemap and
    RSS absolute URLs are generated from it. Do **not** carry over stemageddon's
-   `www`-only convention.
+   `www`-only convention. Rules > **Redirect Rules**: hostname equals
+   `www.davidcberry.com`, dynamic redirect to
+   `concat("https://davidcberry.com", http.request.uri.path)`, 301, preserve
+   query string.
 
 After that it is push-to-deploy, with a preview URL per branch.
 
+**The trap, and why it is worse here than on most sites:** `site:` in
+`astro.config.mjs` is baked into every canonical tag, every `sitemap-0.xml`
+entry, and every `rss.xml` link at build time. A working `www` with a dead apex
+is therefore not a cosmetic alias problem: the site serves fine to a human on
+`www` while every machine-readable URL it publishes points at a hostname that
+does not resolve. Verify the apex itself, not just "the site loads."
+
+**Verification, 2026-08-23.** All 9 sitemap URLs 200 on the apex; `rss.xml` and
+`robots.txt` 200; unknown paths 404; `public/_headers` confirmed applied in the
+response (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy,
+Permissions-Policy). Re-run anytime:
+
+```bash
+for u in $(curl -sS https://davidcberry.com/sitemap-0.xml | grep -o '<loc>[^<]*</loc>' | sed 's/<[^>]*>//g'); do
+  printf "%-58s %s\n" "$u" "$(curl -sS -o /dev/null -w '%{http_code}' "$u")"
+done
+```
+
 **Free tier headroom:** 500 builds/month (this needs roughly 12 to 20),
 unlimited bandwidth, 20,000 files per site.
+
+### Canonical host: apex, enforced 2026-08-23
+
+`www.davidcberry.com` stays attached as a Pages custom domain (removing it would
+delete the DNS record, so `www` would stop resolving and never reach the edge at
+all). A zone-level **Redirect Rule** intercepts it before Pages is consulted:
+
+- Rules > **Overview** > Create rule > Redirect rule. Redirect Rules is no longer
+  its own sidebar entry. **Page Rules, sitting right next to it, is the deprecated
+  legacy product** — do not use it.
+- Filter: `http.host eq "www.davidcberry.com"`
+- Action type: **Dynamic**, expression
+  `concat("https://davidcberry.com", http.request.uri.path)`
+- 301, **Preserve query string** checked
+
+**Type must be Dynamic.** Static redirects every request to one fixed URL, which
+would flatten `www/about/` onto the homepage — breaking nine URLs to fix one.
+
+Verified: `www/` and `www/about/` 301 to the matching apex path, query strings
+survive, resolution is **single-hop**, and the apex itself does not redirect (no
+loop).
+
+```bash
+curl -sSL -o /dev/null -w "final: %{url_effective}  hops: %{num_redirects}\n" \
+  "https://www.davidcberry.com/writing/?a=1"
+# expect: final: https://davidcberry.com/writing/?a=1  hops: 1
+```
 
 ### Headers
 
