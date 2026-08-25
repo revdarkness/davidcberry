@@ -11,6 +11,7 @@ const d = post.data;
 const canonical = new URL(`/${post.id}/`, SITE.url).href;
 const stamp = d.pubDate.toLocaleDateString('en-US', {
   year: 'numeric',
+  timeZone: 'UTC',
   month: 'long',
   day: 'numeric',
 });
@@ -55,6 +56,7 @@ const stamp = d.pubDate.toLocaleDateString('en-US', {
           <time datetime={d.updatedDate.toISOString()}>
             {d.updatedDate.toLocaleDateString('en-US', {
               year: 'numeric',
+              timeZone: 'UTC',
               month: 'long',
               day: 'numeric',
             })}

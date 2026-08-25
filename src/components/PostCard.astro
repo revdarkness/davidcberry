@@ -10,6 +10,7 @@ const d = post.data;
 const blurb = d.description ?? d.standfirst ?? '';
 const stamp = d.pubDate.toLocaleDateString('en-US', {
   year: 'numeric',
+  timeZone: 'UTC',
   month: 'short',
   day: 'numeric',
 });
