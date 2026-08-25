@@ -9,6 +9,12 @@ interface Props {
   ogType?: 'website' | 'article';
   /** Set on article pages so the canonical matches what was published. */
   canonical?: string;
+  /** Root-relative path to a 1200x630 preview card. Defaults site-wide. */
+  image?: string;
+  imageAlt?: string;
+  /** Article pages only. ISO strings; emitted as article:* timestamps. */
+  publishedTime?: string;
+  modifiedTime?: string;
 }
 
 const {
@@ -16,7 +22,16 @@ const {
   description = SITE.description,
   ogType = 'website',
   canonical = new URL(Astro.url.pathname, SITE.url).href,
+  image = '/og/default.png',
+  imageAlt = `${SITE.author}. ${SITE.tagline}`,
+  publishedTime,
+  modifiedTime,
 } = Astro.props;
+
+// og:image MUST be absolute. A root-relative path is the single most common way
+// this silently produces no preview at all, and the failure is indistinguishable
+// from having no tag, so it survives review.
+const ogImage = new URL(image, SITE.url).href;
 
 const fullTitle = title === SITE.title ? title : `${title} — ${SITE.title}`;
 const favicon =
@@ -33,10 +48,25 @@ const favicon =
     <link rel="canonical" href={canonical} />
 
     <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE.title} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    {ogType === 'article' && <meta property="article:author" content={SITE.author} />}
+
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
 
     <link rel="icon" href={favicon} />
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />

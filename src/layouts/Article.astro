@@ -22,6 +22,10 @@ const stamp = d.pubDate.toLocaleDateString('en-US', {
   description={d.description ?? d.standfirst ?? SITE.description}
   ogType="article"
   canonical={canonical}
+  image={d.image}
+  imageAlt={d.imageAlt}
+  publishedTime={d.pubDate.toISOString()}
+  modifiedTime={d.updatedDate?.toISOString()}
 >
   <div class="article-head">
     <div class="wrap">

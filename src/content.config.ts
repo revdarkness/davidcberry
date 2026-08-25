@@ -35,6 +35,13 @@ const writing = defineCollection({
         author: z.string().optional(),
       })
       .optional(),
+    // Social preview card, as a site-root-relative path, e.g. "/og/slug.png".
+    // Omit and the site-wide default at /og/default.png is used. Whatever is set
+    // here must be 1200x630, because that is the size the meta tags declare and a
+    // declared size that does not match the file makes some scrapers skip it.
+    image: z.string().startsWith('/').optional(),
+    // Alt text for that card. Falls back to a description of the default card.
+    imageAlt: z.string().optional(),
     // Drafts build locally but are excluded from the list, topics and feed.
     draft: z.boolean().default(false),
     // Set true on the pieces that should surface on the landing page.
