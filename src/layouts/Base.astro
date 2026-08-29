@@ -36,6 +36,14 @@ const ogImage = new URL(image, SITE.url).href;
 const fullTitle = title === SITE.title ? title : `${title} — ${SITE.title}`;
 const favicon =
   "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='none' stroke='%230a6c80' stroke-width='9'/><circle cx='50' cy='50' r='15' fill='%2336e0ff'/></svg>";
+
+// Cloudflare Web Analytics. The token is PUBLIC by design: it ships in the HTML
+// of every page and identifies the site, not the account. It is not a secret and
+// does not belong in an env var or a secrets store.
+// Paste the token from Cloudflare dashboard > Web Analytics > davidcberry.com.
+// While this is empty the beacon is not emitted at all, so a missing token fails
+// visibly (no script tag in view-source) instead of silently collecting nothing.
+const CF_BEACON_TOKEN = 'f322f3ed34844b36a137d6abc7d7f6f2';
 ---
 
 <!doctype html>
@@ -88,5 +96,14 @@ const favicon =
       <slot />
     </main>
     <Footer />
+    {
+      CF_BEACON_TOKEN && (
+        <script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: CF_BEACON_TOKEN })}
+        />
+      )
+    }
   </body>
 </html>
