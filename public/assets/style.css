@@ -1,3 +1,18 @@
+/* Self-hosted variable fonts, added 2026-08-30 to fix a Poor CLS score.
+   These were previously pulled from fonts.googleapis.com with display=swap
+   against a system-ui fallback and no metric overrides, so every page reflowed
+   when the webfonts landed. LCP was already excellent; the layout shift was the
+   entire defect.
+   Google serves ONE variable file per family, so three files cover every weight
+   from 400 to 700 and the browser interpolates the rest. Downloading the four
+   "separate" weights fetched the identical file four times.
+   No unicode-range is declared on purpose. Only the latin subset is shipped, and
+   omitting the range lets the browser fall back per-glyph for anything outside
+   it rather than skipping the font for a whole page over one character. */
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:400 700;font-display:swap;src:url('/assets/fonts/hanken-grotesk-var.woff2') format('woff2')}
+@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:400 700;font-display:swap;src:url('/assets/fonts/space-grotesk-var.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 700;font-display:swap;src:url('/assets/fonts/jetbrains-mono-var.woff2') format('woff2')}
+
 /* davidcberry.com — quieter dialect of the STEMAGEDDON brand.
    Shared DNA: same type + palette. Light warm-paper base, armor theming stripped.
    Design approved 2026-06-23 (davidcberry-mockup.html). */
