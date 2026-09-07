@@ -1,0 +1,22 @@
+---
+// A copyable code block for the guide pages.
+//
+// The code arrives as a prop rather than a slot on purpose: an .astro template
+// parses `{` as an expression delimiter, and half the snippets in the agent
+// guide are JSON. Passing the text through means braces survive untouched and
+// no snippet needs escaping.
+interface Props {
+  /** Filename or context shown in the block's header bar. */
+  label: string;
+  code: string;
+}
+const { label, code } = Astro.props;
+---
+
+<div class="codeblock">
+  <div class="codeblock-head">
+    <span>{label}</span>
+    <button type="button" class="copy-btn">Copy</button>
+  </div>
+  <pre><code>{code}</code></pre>
+</div>

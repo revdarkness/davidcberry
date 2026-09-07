@@ -298,3 +298,61 @@ footer.site .fl a:hover{color:var(--teal)}
 a:focus-visible,.btn:focus-visible,.topic-chip:focus-visible{
   outline:3px solid var(--teal);outline-offset:2px;border-radius:4px;
 }
+
+/* ================= GUIDE (/agent/) ================= */
+
+/* Numbered h2s. The guide is a build sequence, so the numbers carry order
+   rather than decorate it; nothing else on the site is numbered for that reason. */
+.prose h2 .step-n{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.72em;color:var(--teal);margin-right:.7em;
+  font-weight:600;letter-spacing:.04em;
+}
+
+/* Copyable code blocks. The markdown pages get Shiki; these are hand-placed in
+   an .astro template and need their own chrome for the header bar and button. */
+.codeblock{
+  border:1px solid var(--line);border-radius:10px;background:var(--surface);
+  overflow:hidden;box-shadow:var(--shadow);
+}
+.codeblock-head{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:9px 12px 9px 16px;border-bottom:1px solid var(--line);background:var(--paper);
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.7rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--body);
+}
+/* --body, not --muted: at 0.7rem this is small text under WCAG 2.2 SC 1.4.3 and
+   --muted on --paper is 3.71:1. --body is 7.6:1 and reads the same. */
+.copy-btn{
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.7rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);
+  background:var(--surface);border:1px solid var(--line);border-radius:6px;
+  padding:5px 11px;cursor:pointer;transition:.15s;
+}
+.copy-btn:hover{border-color:var(--teal);color:var(--teal)}
+.copy-btn.is-copied{border-color:var(--teal);color:var(--teal)}
+/* the block owns the frame, so the <pre> inside drops the one .prose gives it */
+.codeblock pre{border:none;border-radius:0;margin:0;padding:18px 20px;background:none}
+/* Wrap rather than scroll, matching shikiConfig.wrap on the markdown pages. A
+   guide whose whole job is being copied should never hide the end of a line
+   behind a horizontal scrollbar. */
+.codeblock pre code{white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* Troubleshooting. Closed by default so the section reads as a list of symptoms
+   you scan, not five answers you scroll past. */
+.faq{border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{
+  cursor:pointer;padding:16px 0;list-style:none;display:flex;gap:12px;align-items:baseline;
+  font-family:'Space Grotesk',system-ui,sans-serif;font-weight:600;color:var(--ink);
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{
+  content:"+";font-family:'JetBrains Mono',ui-monospace,monospace;
+  color:var(--teal);font-size:1.05rem;line-height:1;
+}
+.faq details[open] summary::before{content:"\2013"}
+.faq summary:hover{color:var(--teal)}
+.faq summary:focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-radius:4px}
+.faq .answer{padding:0 0 20px 26px}
+.faq .answer > * + *{margin-top:1.15em}

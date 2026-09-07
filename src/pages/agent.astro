@@ -1,0 +1,611 @@
+---
+import Base from '../layouts/Base.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+
+// Set this once the walkthrough is published and the callout at the foot of the
+// page renders itself. Empty means no callout at all, rather than a dead link.
+const VIDEO_URL = '';
+
+const snippets = {
+  install: 'npm install -g @anthropic-ai/claude-code',
+
+  folder: `mkdir ~/my-agent
+cd ~/my-agent
+claude`,
+
+  tree: `my-agent/
+├── CLAUDE.md              the identity and the rules
+├── context/
+│   ├── me.md              who you are
+│   ├── work.md            the job and its constraints
+│   └── goals.md           what counts as progress
+├── decisions/
+│   └── log.md             append only, never edited
+└── .claude/
+    ├── settings.json      startup hooks
+    └── skills/
+        └── weekly-report/
+            └── SKILL.md   one job, written out`,
+
+  identity: `# CLAUDE.md -- ATLAS
+
+## Identity
+
+ATLAS is Mark's operational assistant. Direct, competent, dry. It leads
+with the answer, then the reasoning. It does not open with "Great
+question." It does not celebrate small wins. It assumes it is talking to
+a professional who does not need hand holding.
+
+## Top Priority
+
+Ship the work. When two goals conflict, the one with a real deadline wins.
+
+## Context
+
+@context/me.md
+@context/work.md
+@context/goals.md
+
+## Rules
+
+- No emojis. Bullet points over paragraphs.
+- When presenting options, lead with a recommendation. Do not hand me a menu.
+- Ask one clarifying question, not five. If a reasonable assumption is
+  available, make it and say what you assumed.
+- Never invent a fact about my schedule, my people, or my numbers. If you
+  do not know, say you do not know.`,
+
+  me: `# Operator Profile
+
+- **Name:** Mark Reyes
+- **Role:** Operations manager, regional logistics firm, since 2021
+- **Timezone:** Central
+- **Background:** Fifteen years in warehousing and freight. Started on the
+  floor, moved to scheduling, then management. Not technical by training
+  but comfortable with systems.
+- **How I work:** Mornings for planning, afternoons for meetings. I decide
+  fast and I dislike being asked to reconsider settled decisions.
+- **What I want back:** the answer first, then the why. Short.`,
+
+  work: `# Work Context
+
+## What the business is
+Regional freight brokerage. 40 employees, three warehouses, mostly
+regional retail clients.
+
+## My scope
+Scheduling, driver assignments, client escalations, weekly ops reporting.
+
+## Tools
+- TMS: McLeod
+- Comms: Outlook and Teams
+- Reporting: Excel, exported weekly
+
+## Constraints
+- Nothing with client names or driver personal information leaves my machine.
+- IT locks down installs. Assume browser based or local only.`,
+
+  goals: `# Goals
+
+**Quarter:** Q4 2026
+
+1. Cut the weekly ops report from four hours to one.
+2. Get driver assignment conflicts under five a week.
+3. Document the escalation process so it survives me being out.`,
+
+  mkskill: 'mkdir -p .claude/skills/weekly-report',
+
+  skill: `---
+name: weekly-report
+description: Build the weekly operations report from raw exports. Use
+  whenever Mark says weekly report, ops report, Friday numbers, or hands
+  over a weekly export file.
+---
+
+# Weekly Ops Report
+
+## Purpose
+Turn the weekly TMS export into the report the regional director actually
+reads, in Mark's voice, in under ten minutes.
+
+## Inputs
+- The weekly export CSV, dropped in \`exports/\`
+- Last week's report, for the comparison column
+
+## Process
+
+1. Read the export. Confirm the row count and date range out loud before
+   doing anything else. If the range is not seven days, stop and say so.
+2. Calculate: total loads, on-time percentage, exceptions by warehouse,
+   top three delay causes.
+3. Compare every number to last week. Direction and delta, not just value.
+4. Flag anything that moved more than fifteen percent either way.
+5. Write the summary. Four sentences maximum, plain language, no adjectives.
+6. Output in this order: summary, table, flags, one recommendation.
+
+## Rules
+- Never estimate a number missing from the export. Say it is missing.
+- No client names in the summary. Warehouse codes only.
+- One recommendation, not three. The most actionable one.
+
+## Output
+Markdown file at \`reports/YYYY-MM-DD-ops.md\`.`,
+
+  remember:
+    'Remember that I always want on-time percentage rounded to one decimal, never two.',
+
+  log: `# Decision Log
+
+Append only. Never edit a past entry.
+
+Format: [YYYY-MM-DD] DECISION: ... | REASONING: ... | CONTEXT: ...
+
+---
+
+[2026-09-07] DECISION: Automate the weekly ops report before the escalation
+documentation. | REASONING: Four hours a week of my time, and the format
+has not changed in two years, so it is stable enough to automate. |
+CONTEXT: Escalation docs matter more strategically but the process is still
+changing, and you do not automate a moving target.`,
+
+  hook: `{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \\"CLOCK: $(date '+%A, %B %d, %Y %I:%M %p %Z')\\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}`,
+
+  run: 'It is Friday and I just dropped this week\'s export in exports/. Do the report.',
+
+  pushback:
+    'I am thinking about spending next week rebuilding the driver assignment spreadsheet. Worth it?',
+
+  byname: 'Use the weekly-report skill on this file.',
+};
+---
+
+<Base
+  title="Build Your Own Operator"
+  description="A step-by-step guide to building a custom AI assistant that knows your job, follows your rules, and runs your repeat work. Nine plain text files, no code, about 45 minutes."
+>
+  <div class="article-head">
+    <div class="wrap">
+      <div class="meta">
+        <span class="tag">Guide</span>
+        <span>45 minutes</span>
+        <span>No code required</span>
+      </div>
+      <h1>Build your own operator</h1>
+      <p class="standfirst">
+        A custom AI assistant that knows your job, follows your rules, and runs your repeat
+        work on command. It is not an app you install. It is nine plain text files in a folder,
+        and the first working version takes an afternoon.
+      </p>
+    </div>
+  </div>
+
+  <article class="prose">
+    <p>
+      I run one of these. Mine is called FORGE, it handles lesson planning, grading support,
+      project tracking and a morning briefing, and it has been sharpening for months rather than
+      being rebuilt. People ask how it works and expect the answer to involve a framework.
+    </p>
+
+    <div class="lede-rule">
+      <b>It is a folder of markdown files.</b>
+      <span
+        >No Python, no API keys to juggle, no orchestration layer. If you can write a note for a
+        substitute, you can build one.</span
+      >
+    </div>
+
+    <p>
+      What follows is the whole method, in build order. The worked example is a fictional
+      operations manager rather than a teacher, because the method has nothing to do with
+      teaching and you should be able to see your own job in it.
+    </p>
+
+    <h2>What you are actually building</h2>
+
+    <p>
+      Most people use AI as a conversation. You type, you get an answer, you close the window,
+      and everything you explained is gone. Tomorrow you explain it again. That treadmill is why
+      most people quietly stop using these tools. They are not getting worse output than anyone
+      else, they are just re-briefing a stranger every morning.
+    </p>
+
+    <p>An agent breaks the loop with four things, and each one is a file you write in plain English.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Piece</th>
+          <th>What it holds</th>
+          <th>Where it lives</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Context</strong></td>
+          <td>Who you are, what you do, who you work with, what you are trying to finish</td>
+          <td><code>context/*.md</code></td>
+        </tr>
+        <tr>
+          <td><strong>Rules</strong></td>
+          <td>How it should behave. Tone, format, and what it must never do</td>
+          <td><code>CLAUDE.md</code></td>
+        </tr>
+        <tr>
+          <td><strong>Skills</strong></td>
+          <td>Step-by-step procedures for jobs you do more than once</td>
+          <td><code>.claude/skills/&lt;name&gt;/SKILL.md</code></td>
+        </tr>
+        <tr>
+          <td><strong>Memory</strong></td>
+          <td>Decisions already made, so neither of you relitigates them</td>
+          <td><code>decisions/log.md</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Here is the finished shape. That is the entire system.</p>
+
+    <CodeBlock label="the whole thing" code={snippets.tree} />
+
+    <h2><span class="step-n">01</span>Install the two pieces</h2>
+
+    <p>
+      <strong>VS Code</strong> is a free editor from Microsoft, and you are using it as a place to
+      see your folder on the left and edit text on the right. Nothing more. Download it from
+      <a href="https://code.visualstudio.com" rel="noopener">code.visualstudio.com</a>.
+    </p>
+
+    <p>
+      <strong>Claude Code</strong> is the agent. It runs in VS Code's terminal, reads and writes
+      the files in your folder, and picks up everything you write. In VS Code open the Extensions
+      icon in the left rail, search <code>Claude Code</code>, and install the official Anthropic
+      one. Then open <strong>Terminal &rarr; New Terminal</strong> and run:
+    </p>
+
+    <CodeBlock label="terminal" code={snippets.install} />
+
+    <div class="callout">
+      <p class="sec-label">If that fails</p>
+      <h3>"npm is not recognized"</h3>
+      <p>
+        You are missing Node.js. Install the LTS build from
+        <a href="https://nodejs.org" rel="noopener">nodejs.org</a>, quit VS Code completely, reopen
+        it, and run the line again. A reopened terminal panel does not always inherit the new path,
+        so quit the whole application. This is where nearly everyone gets stuck and it is a two
+        minute fix.
+      </p>
+    </div>
+
+    <p>
+      One thing worth saying plainly rather than at the end: this needs a paid Claude plan. There
+      is no free tier that does what is described below.
+    </p>
+
+    <h2><span class="step-n">02</span>Your agent is a folder</h2>
+
+    <p>
+      Not an account, not a cloud service. A folder on your machine. Back it up like a folder,
+      move it like a folder, and when you want a second agent for a different part of your life,
+      make a second folder.
+    </p>
+
+    <CodeBlock label="terminal" code={snippets.folder} />
+
+    <p>
+      On Windows the same commands work in the VS Code terminal; if <code>~</code> misbehaves, use
+      <code>mkdir C:\Users\YourName\my-agent</code> instead. Then
+      <strong>File &rarr; Open Folder</strong> and pick it, so the file tree on the left points at
+      the same place. The first <code>claude</code> run opens a browser to log in.
+    </p>
+
+    <p>
+      That prompt at the bottom of the screen is your agent. Right now it knows nothing about you.
+      Everything from here is furnishing the room.
+    </p>
+
+    <h2><span class="step-n">03</span>Write the identity file</h2>
+
+    <p>
+      <code>CLAUDE.md</code> sits in the root of the folder and is read automatically at the start
+      of every session. It is the file that turns a generic assistant into yours, and it is the one
+      people rush. Run <code>/init</code> in the prompt for a starter, then replace it with
+      something real.
+    </p>
+
+    <CodeBlock label="CLAUDE.md" code={snippets.identity} />
+
+    <p>Three things make that file work.</p>
+
+    <ul>
+      <li>
+        <strong>The personality is specific.</strong> "Be helpful and friendly" is worth nothing,
+        because every model is already trying that, and that default is exactly what most people
+        find grating. Write what is actually different about how you want to be spoken to.
+      </li>
+      <li>
+        <strong>The top priority is a tie breaker.</strong> When two reasonable actions compete,
+        that one line decides. Make it a sentence you would defend out loud.
+      </li>
+      <li>
+        <strong>The <code>@</code> lines pull files in.</strong> Anything referenced that way loads
+        automatically. That is how context arrives without you pasting it every time.
+      </li>
+    </ul>
+
+    <h2><span class="step-n">04</span>Write down what a good assistant learns in two months</h2>
+
+    <p>
+      This is the step that separates an agent that impresses you for a day from one you are still
+      using in six months. Run <code>mkdir context</code> and write three short files. Short and
+      true beats long and aspirational.
+    </p>
+
+    <CodeBlock label="context/me.md" code={snippets.me} />
+    <CodeBlock label="context/work.md" code={snippets.work} />
+    <CodeBlock label="context/goals.md" code={snippets.goals} />
+
+    <div class="callout">
+      <p class="sec-label">The paragraph that earns the most</p>
+      <h3>Constraints</h3>
+      <p>
+        An agent that does not know your limits will hand you a confident plan you are not allowed
+        to execute, and you will spend more time arguing with it than doing the work. Write down
+        what you cannot install, cannot share, and cannot spend. Mine knows the district blocks
+        most tools before it proposes any of them.
+      </p>
+    </div>
+
+    <p>
+      The numbers in the goals file do real work too. Once they are written down, the agent can
+      tell you whether the thing you are about to spend a week on moves one of them, or whether
+      you are just busy.
+    </p>
+
+    <h2><span class="step-n">05</span>Teach it one job</h2>
+
+    <p>
+      Context is what it knows. A skill is what it does. The rule for when to write one:
+      <strong>the second time you ask for the same kind of thing.</strong> Not the first, because
+      you do not know the shape yet.
+    </p>
+
+    <CodeBlock label="terminal" code={snippets.mkskill} />
+
+    <p>
+      Then create <code>SKILL.md</code> inside it. The block between the dashed lines at the top is
+      how the agent decides on its own that this skill applies, so write it with the words you
+      actually use, including the sloppy ones.
+    </p>
+
+    <CodeBlock label=".claude/skills/weekly-report/SKILL.md" code={snippets.skill} />
+
+    <p>
+      Save it and it is live. No restart, no install step. Write the process as numbered steps
+      aimed at a competent new hire who does not know your job yet, because that is exactly the
+      right voice for it.
+    </p>
+
+    <p>
+      And make step one a verification step. Have it check its inputs and say what it found before
+      it works. That single habit prevents most of the bad output you would otherwise get, and it
+      is the same reason every control I write about here has a verification section.
+    </p>
+
+    <h2><span class="step-n">06</span>Memory, and the file people skip</h2>
+
+    <p>To make something permanent, just say so in the prompt:</p>
+
+    <CodeBlock label="prompt" code={snippets.remember} />
+
+    <p>
+      That is the whole mechanism. Any time you catch yourself making the same correction twice,
+      say "remember that" and it stops. Then there is the decision log, which is the piece almost
+      everyone skips and later wishes they had not. Run <code>mkdir decisions</code>:
+    </p>
+
+    <CodeBlock label="decisions/log.md" code={snippets.log} />
+
+    <p>
+      Append only. You never edit an old entry, especially not when you turned out to be wrong.
+    </p>
+
+    <p>
+      In four months you will look at some piece of your setup and think, why did I do it that
+      way. Without this file you either live with it or rip it out and rediscover the reason the
+      hard way. With it you get your own reasoning back in one line, and your agent reads it, so it
+      stops proposing what you already ruled out. This is the file that makes the system compound
+      instead of drift.
+    </p>
+
+    <h2><span class="step-n">07</span>Optional: make it know what day it is</h2>
+
+    <p>
+      Out of the box your agent is not reliable about today's date, which gets annoying inside a
+      week. A hook is a command that runs automatically when a session starts. Create
+      <code>.claude/settings.json</code>:
+    </p>
+
+    <CodeBlock label=".claude/settings.json" code={snippets.hook} />
+
+    <p>
+      Now every session opens with the real date and time handed to it. The same pattern runs
+      anything else you want at startup; mine pulls in a task queue from my phone. Start with the
+      clock and add more only when you have a reason.
+    </p>
+
+    <h2><span class="step-n">08</span>Run it</h2>
+
+    <p>Restart Claude Code so the new files load, then ask for the job the way you would ask a person:</p>
+
+    <CodeBlock label="prompt" code={snippets.run} />
+
+    <p>
+      Watch what does not happen. It does not ask what a weekly report is, who it is for, what
+      format you want, or what you are not allowed to include. It found the skill from the phrase
+      "the report", checked the date range first because the skill told it to, and wrote in the
+      voice from the identity file.
+    </p>
+
+    <p>Now the other kind of question, the one that proves the context is doing work:</p>
+
+    <CodeBlock label="prompt" code={snippets.pushback} />
+
+    <p>
+      A good build pushes back here, because it read the goals file and knows the escalation
+      documentation is the item that survives him being out. That is the part I did not expect
+      when I started, and it is now the part I would not give up. It is not just faster. It is a
+      second opinion that has actually read the file.
+    </p>
+
+    <h2>When it breaks</h2>
+
+    <div class="faq">
+      <details>
+        <summary>It is ignoring my CLAUDE.md</summary>
+        <div class="answer">
+          <p>
+            Three usual causes. The file is not in the folder you opened, so check the file tree.
+            The name is wrong: it is <code>CLAUDE.md</code>, capitalised, with the
+            <code>.md</code> extension, and Windows may be hiding that extension from you. Or the
+            session started before you wrote it, so restart Claude Code.
+          </p>
+        </div>
+      </details>
+      <details>
+        <summary>My skill never triggers</summary>
+        <div class="answer">
+          <p>
+            Almost always the description. It has to name the words you actually say, not the
+            formal name of the task. If you say "Friday numbers", put "Friday numbers" in the
+            description. Force it by name first to prove the file itself is fine:
+          </p>
+          <CodeBlock label="prompt" code={snippets.byname} />
+          <p>
+            If that works and the automatic trigger does not, rewrite the description. If it fails
+            too, check the path is exactly <code>.claude/skills/&lt;name&gt;/SKILL.md</code> and
+            that the block at the top opens and closes with three dashes on their own lines.
+          </p>
+        </div>
+      </details>
+      <details>
+        <summary>The output is generic and does not sound like me</summary>
+        <div class="answer">
+          <p>
+            Your identity file is describing a nice assistant instead of yours. Cut every sentence
+            that would be true of any assistant. Add the specifics: the phrases you hate, the
+            format you want, the length you will actually read. Then paste in two or three
+            paragraphs of your own writing and tell it that is the voice to match.
+          </p>
+        </div>
+      </details>
+      <details>
+        <summary>It confidently told me something false</summary>
+        <div class="answer">
+          <p>
+            It will, sometimes, and the fix is structural rather than a scolding. Add the rule to
+            <code>CLAUDE.md</code>: never state a number or a fact about my work without saying
+            where it came from. Then build verification into your skills as step one. An agent that
+            has to say what it read before it acts is much harder to catch out.
+          </p>
+        </div>
+      </details>
+      <details>
+        <summary>Do I need to know git for this?</summary>
+        <div class="answer">
+          <p>
+            No. Nothing here requires it. Once the agent starts being genuinely useful you will
+            want version history on these files, and at that point ask the agent itself to set up
+            git and explain it as it goes. That is a good first real task for it.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <h2>The first four weeks</h2>
+
+    <p>
+      The trap is spending a weekend building fifteen skills. I fell in it. You write elaborate
+      procedures for jobs you turn out not to do often, and they rot. Use what you built and let
+      the system tell you what it needs.
+    </p>
+
+    <ol>
+      <li>Use it daily with exactly what you built today. Change nothing. Notice where it annoys you.</li>
+      <li>Every correction you make twice becomes a line in a context file or a rule in <code>CLAUDE.md</code>.</li>
+      <li>Write your second skill, for whatever you have now asked for three times. Copy the shape of the first.</li>
+      <li>Read your decision log. Rewrite the identity file with what you have learned about how you want to be talked to.</li>
+    </ol>
+
+    <p>
+      Four weeks of that and you have something genuinely specific to you, without having built a
+      single thing you did not need.
+    </p>
+
+    <h2>Three things not to do</h2>
+
+    <ul>
+      <li>
+        <strong>Do not put secrets in these files.</strong> No passwords, no API keys, no bank
+        details, nothing containing another person's private information. They are plain text, they
+        get backed up and synced, and the agent reads all of them.
+      </li>
+      <li>
+        <strong>Do not let it act on the outside world unsupervised.</strong> Sending mail, posting,
+        moving money, deleting anything. Watch it do that job correctly several times with you
+        approving each step, and keep the leash on anything irreversible.
+      </li>
+      <li>
+        <strong>Do not trust a number without the source.</strong> A confident wrong figure is the
+        failure mode that actually costs you something. Ask what it read. Make your skills say it
+        first.
+      </li>
+    </ul>
+
+    {
+      VIDEO_URL && (
+        <div class="callout">
+          <p class="sec-label">Watch instead</p>
+          <h3>The same build, on video</h3>
+          <p>Every step above, recorded end to end from an empty folder.</p>
+          <a class="btn btn-primary" href={VIDEO_URL} rel="noopener">
+            Watch the walkthrough
+          </a>
+        </div>
+      )
+    }
+  </article>
+
+  <div class="article-foot">
+    <div class="byline">
+      <svg width="34" height="34" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#0a6c80" stroke-width="7"></circle>
+        <circle cx="50" cy="50" r="14" fill="#36e0ff"></circle>
+      </svg>
+      <div>
+        <span class="who">David Berry</span>
+        <p>
+          I teach high school engineering design and run the infrastructure behind it: a production
+          site, a private GPU inference node, and the monitoring that watches both. The agent
+          described here is the one I use to operate all of it. Free to copy, adapt, and hand to
+          someone else.
+        </p>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<script is:inline defer src="/assets/agent-copy.js"></script>
