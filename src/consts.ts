@@ -6,6 +6,7 @@ export const SITE = {
   url: 'https://davidcberry.com',
   author: 'David Berry',
   email: 'david@davidcberry.com',
+  newsletter: 'https://davidcberry.substack.com/',
 } as const;
 
 export type Topic = 'cyber' | 'ai-governance' | 'career' | 'reading';
